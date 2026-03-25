@@ -27,9 +27,8 @@ setup/
   icingaweb2-apache.conf    — Apache vhost for IcingaWeb2 on port 8088
 icinga2/
   commands.conf             — Custom CheckCommand definitions (nrpe_tls, DNS, IMAP, broker notifs)
-  vps-services.conf         — VPS-agent services (placed in Director stage by director-deploy.sh)
+  vps-services.conf         — VPS-agent services (lives in zones.d/master/ on the host, outside Director)
 scripts/
-  director-deploy.sh        — Director deploy workaround (see Known Issues)
   check_rpi_temp.sh         — NRPE plugin: Raspberry Pi CPU temperature
 grafana/
   icinga2-dashboard.json    — Grafana dashboard (push via API or import in UI)
@@ -87,22 +86,25 @@ command[check_temperature]=/opt/TheShare/machine-scripts/check_rpi_temp.sh
 
 Then reload NRPE: `sudo systemctl reload nrpe`
 
+## Director deploys
+
+Use `icingacli director config deploy` directly — no wrapper script needed.
+
+```bash
+docker exec $(docker ps -q -f name=mon_icinga2) icingacli director config deploy
+docker exec $(docker ps -q -f name=mon_icinga2) /etc/init.d/icinga2 reload
+```
+
+The stage-switching bug present in Icinga2 r2.10.3 (circular `include "*/include.conf"` in
+`active.conf`) is **fixed in r2.13.14**.
+
 ## Known Issues
-
-### Director stage-switching bug (Icinga2 r2.10.3)
-
-**Never use `icingacli director config deploy` directly.** Always use `scripts/director-deploy.sh`.
-
-Root cause: Icinga2 r2.10.3 has broken include-deduplication for glob patterns. When Director
-creates a new stage alongside an old one, `active.conf` ends with `include "*/include.conf"`,
-which causes infinite recursion. The deploy script fixes this by removing that line and cleaning
-up old stages before reload.
 
 ### VPS services not managed by Director
 
-`icinga2/vps-services.conf` is placed manually into the Director stage by `director-deploy.sh`
-after every deploy, because Director 1.11.6 cannot model `command_endpoint` on individual
-service objects via its apply-rule system.
+Director 1.11.6 cannot model `command_endpoint` on individual service objects via apply-rules.
+`icinga2/vps-services.conf` lives permanently at `/etc/icinga2/zones.d/master/vps-services.conf`
+on the host, outside Director's scope, and is never touched by deploys.
 
 ### /opt/TheShare is NOT GlusterFS on the Pis
 
