@@ -34,7 +34,9 @@ RUN curl -sSL https://packages.icinga.com/icinga.key | gpg --dearmor \
 # ── Icinga packages ────────────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
       "icinga2=${ICINGA2_VERSION}" \
-      icinga2-ido-mysql \
+      "icinga2-bin=${ICINGA2_VERSION}" \
+      "icinga2-common=${ICINGA2_VERSION}" \
+      "icinga2-ido-mysql=${ICINGA2_VERSION}" \
       icingaweb2 \
       icinga-director-web \
       icinga-director-daemon \
