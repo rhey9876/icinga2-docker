@@ -134,6 +134,8 @@ CONF
     # Enable modules
     ln -sf /usr/share/icingaweb2/modules/monitoring \
            /etc/icingaweb2/enabledModules/monitoring
+    ln -sf /usr/share/icingaweb2/modules/incubator \
+           /etc/icingaweb2/enabledModules/incubator
     ln -sf /usr/share/icingaweb2/modules/director \
            /etc/icingaweb2/enabledModules/director 2>/dev/null || true
 
