@@ -65,6 +65,9 @@ RUN rm -f /etc/icinga2/conf.d/hosts.conf \
 # ── Cert path compat with existing setup ──────────────────────────────────────
 RUN mkdir -p /opt/nagios/etc/cert
 
+# ── Save default /etc/icinga2 so entrypoint can seed fresh volume mounts ──────
+RUN cp -r /etc/icinga2 /etc/icinga2-default
+
 # ── Supervisor ─────────────────────────────────────────────────────────────────
 COPY supervisord.conf /etc/supervisor/conf.d/icinga.conf
 

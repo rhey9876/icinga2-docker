@@ -1,9 +1,16 @@
 #!/bin/bash
-# Container entrypoint — runs init scripts then hands off to supervisord.
+# Container entrypoint — fixes volume permissions, runs init, hands off to supervisord.
 set -euo pipefail
 
 export TZ="${TZ:-Europe/Berlin}"
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# ── Fix volume permissions (mounted dirs arrive owned by root) ────────────────
+chown -R nagios:nagios /etc/icinga2 /var/lib/icinga2
+chown -R mysql:mysql   /var/lib/mysql
+chown -R www-data:www-data /data
+mkdir -p /var/log/icinga2/crash /var/run/icinga2
+chown nagios:nagios /var/log/icinga2/crash /var/run/icinga2
 
 # ── MySQL: initialize data directory on first run ─────────────────────────────
 if [ ! -d /var/lib/mysql/mysql ]; then
@@ -19,7 +26,7 @@ MYSQL_PID=$!
 /setup/mysql-init.sh
 /setup/icinga2-init.sh
 
-# ── Stop temporary MySQL (supervisord will restart it) ────────────────────────
+# ── Stop temporary MySQL (supervisord will restart it properly) ───────────────
 echo "[entrypoint] Stopping init MySQL..."
 mysqladmin shutdown 2>/dev/null || true
 wait $MYSQL_PID 2>/dev/null || true

@@ -8,8 +8,15 @@ DIRECTOR_PASS="${ICINGA2_FEATURE_DIRECTOR_PASS:-changeme}"
 ICINGA_DB_PASS="${ICINGA_DB_PASS:-icinga2}"
 DIRECTOR_DB_PASS="${DIRECTOR_DB_PASS:-director}"
 
+# ── Seed /etc/icinga2 from defaults if fresh volume mount ─────────────────────
+if [ ! -f /etc/icinga2/icinga2.conf ]; then
+    echo "[icinga2-init] Seeding /etc/icinga2 from package defaults..."
+    cp -rn /etc/icinga2-default/. /etc/icinga2/
+    chown -R nagios:nagios /etc/icinga2
+fi
+
 # ── Icinga2 API setup (only on first run) ──────────────────────────────────────
-if [ ! -f /etc/icinga2/pki/${NODENAME}.crt ]; then
+if [ ! -f /var/lib/icinga2/certs/${NODENAME}.crt ]; then
     echo "[icinga2-init] Setting up Icinga2 node (name: ${NODENAME})..."
     icinga2 node setup --master --cn "${NODENAME}" --zone "${NODENAME}"
 fi
