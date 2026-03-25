@@ -1,0 +1,119 @@
+{
+  "dashboard": {
+    "uid": "bab48522-2e5b-44a6-aab9-7df2a826a926",
+    "title": "Icinga2 Monitoring",
+    "tags": ["icinga2", "monitoring"],
+    "timezone": "browser",
+    "refresh": "1m",
+    "time": {"from": "now-3h", "to": "now"},
+    "schemaVersion": 39,
+    "panels": [
+      {
+        "id": 1, "type": "timeseries",
+        "title": "Ping RTA (ms)",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "ms", "custom": {"lineWidth": 1, "fillOpacity": 0}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") * 1000 FROM \"hostalive\" WHERE \"metric\" = 'rta' AND $timeFilter GROUP BY time($__interval), \"host\" fill(previous)",
+          "rawQuery": true, "refId": "A", "alias": "$tag_host"}]
+      },
+      {
+        "id": 10, "type": "timeseries",
+        "title": "CPU Load (1 min, per CPU)",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "short", "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 0},
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 0.7}, {"color": "red", "value": 1.0}]}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") FROM \"nrpe_tls\" WHERE \"metric\" = 'load1' AND \"service\" = 'CPU Load' AND $timeFilter GROUP BY time($__interval), \"host\" fill(null)",
+          "rawQuery": true, "refId": "A", "alias": "$tag_host"}]
+      },
+      {
+        "id": 11, "type": "timeseries",
+        "title": "CPU Temperature (\u00b0C)",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "celsius", "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 0},
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 65}, {"color": "red", "value": 75}]}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") FROM \"nrpe_tls\" WHERE \"metric\" = 'temp' AND \"service\" = 'Temperature' AND $timeFilter GROUP BY time($__interval), \"host\" fill(null)",
+          "rawQuery": true, "refId": "A", "alias": "$tag_host"}]
+      },
+      {
+        "id": 7, "type": "timeseries",
+        "title": "Process Count",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "short", "custom": {"lineWidth": 1, "fillOpacity": 0}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") FROM \"nrpe_tls\" WHERE \"metric\" = 'procs' AND \"service\" = 'Total Processes' AND $timeFilter GROUP BY time($__interval), \"host\" fill(null)",
+          "rawQuery": true, "refId": "A", "alias": "$tag_host"}]
+      },
+      {
+        "id": 4, "type": "timeseries",
+        "title": "IMAP Response Time from VPS (ms)",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "ms", "custom": {"lineWidth": 2, "fillOpacity": 0},
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 500}, {"color": "red", "value": 1000}]}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") * 1000 FROM \"imap\" WHERE \"metric\" = 'time' AND $timeFilter GROUP BY time($__interval), \"host\" fill(previous)",
+          "rawQuery": true, "refId": "A", "alias": "imap $tag_host"}]
+      },
+      {
+        "id": 5, "type": "timeseries",
+        "title": "DNS ext from VPS (ms, via 9.9.9.9)",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "ms", "custom": {"lineWidth": 2, "fillOpacity": 0},
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 200}, {"color": "red", "value": 500}]}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT mean(\"value\") * 1000 FROM \"dns\" WHERE \"metric\" = 'time' AND $timeFilter GROUP BY time($__interval), \"host\" fill(previous)",
+          "rawQuery": true, "refId": "A", "alias": "dns $tag_host"}]
+      },
+      {
+        "id": 6, "type": "timeseries",
+        "title": "DNS MX Validation (ms) \u2014 local resolver + 8.8.8.8",
+        "gridPos": {"x": 0, "y": 24, "w": 24, "h": 8},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "fieldConfig": {"defaults": {"unit": "ms", "custom": {"lineWidth": 1, "fillOpacity": 0},
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 200}, {"color": "red", "value": 500}]}}},
+        "targets": [
+          {"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+            "query": "SELECT mean(\"value\") * 1000 FROM \"check_dns_timed\" WHERE \"metric\" = 'time' AND $timeFilter GROUP BY time($__interval), \"host\" fill(previous)",
+            "rawQuery": true, "refId": "A", "alias": "local: $tag_host"},
+          {"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+            "query": "SELECT mean(\"value\") * 1000 FROM \"check_dns_own_MX\" WHERE \"metric\" = 'time' AND $timeFilter GROUP BY time($__interval), \"host\" fill(previous)",
+            "rawQuery": true, "refId": "B", "alias": "MX via 8.8.8.8: $tag_host"}
+        ]
+      },
+      {
+        "id": 9, "type": "stat",
+        "title": "Current RTA (ms)",
+        "gridPos": {"x": 0, "y": 32, "w": 24, "h": 6},
+        "datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+        "options": {
+          "reduceOptions": {"calcs": ["lastNotNull"]},
+          "orientation": "horizontal",
+          "colorMode": "value",
+          "graphMode": "none"
+        },
+        "fieldConfig": {"defaults": {"unit": "ms",
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null}, {"color": "yellow", "value": 50}, {"color": "red", "value": 200}]}}},
+        "targets": [{"datasource": {"type": "influxdb", "uid": "fe6rjdv686epse"},
+          "query": "SELECT last(\"value\") * 1000 FROM \"hostalive\" WHERE \"metric\" = 'rta' AND $timeFilter GROUP BY \"host\"",
+          "rawQuery": true, "refId": "A", "alias": "$tag_host"}]
+      }
+    ]
+  },
+  "overwrite": true
+}
