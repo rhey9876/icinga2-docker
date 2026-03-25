@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       apache2 libapache2-mod-php \
       php php-mysql php-curl php-gd php-intl php-xml php-mbstring \
       mariadb-server mariadb-client \
-      nagios-plugins \
+      nagios-plugins nagios-nrpe-plugin \
       openssl wget \
     && rm -rf /var/lib/apt/lists/*
 
